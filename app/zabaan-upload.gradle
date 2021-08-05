@@ -1,0 +1,274 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.gradle.nativeplatform.platform.internal.DefaultOperatingSystem
+import groovy.json.JsonSlurper
+
+import javax.net.ssl.*
+import java.io.*
+
+import java.nio.charset.StandardCharsets
+
+/**
+ * Create a custom Task with 2 arguments
+ * 1. [Mandatory] apkPath - Path which should lead to the APK
+ * 2. [Optional] androidHomePath - Path to build-tools/<version> which contains aapt
+ */
+class ZabaanUploadTask extends DefaultTask {
+    @Internal
+    @Option(option = "apkPath", description = "Path of the apk")
+    String apkPath
+
+    @Input
+    @Option(option = "releaseNumber", description = "Release number corresponding to the CMS release")
+    String releaseNumber
+
+    @Input
+    @Option(option = "token", description = "Token required to upload release to CMS")
+    String token
+
+    @Optional
+    @Input
+    @Option(option = "androidHomePath", description = "Path of android Build tools")
+    String androidHomePath
+
+    private static def boundary = 'abcd' + Long.toString(System.currentTimeMillis()) * 2 + 'dcba'
+    private static def twoHyphens = '--'
+    private static def lineEnd = '\r\n'
+
+    @TaskAction
+    void execute() {
+        logger.lifecycle("'filePath': ${apkPath}")
+        logger.lifecycle("'buildPathTool': ${androidHomePath}")
+
+        // Check if arguments are present
+        checkArguments()
+
+        // Get proper AAPT path depending upon the current OS
+        def aaptFolderPath = getAaptFolderFromSdk(androidHomePath)
+        def os = DefaultNativePlatform.getCurrentOperatingSystem()
+
+        // Execute command and get output
+        def output = executeCommand(aaptFolderPath, os)
+
+        // Create bindings build directory and csv file
+        def csvFile = createBindingsFile()
+
+        writeToCSVFile(csvFile, output)
+        println()
+        println()
+        println("----------------------------------------------------------------------------------------------------")
+        println("CSV File created at $csvFile.absolutePath")
+        println("----------------------------------------------------------------------------------------------------")
+
+        // Check release number to make sure we are always targeting the latest release and return deployment id
+        def deploymentId = checkReleaseNumber(releaseNumber, token)
+        println()
+        println()
+        println("----------------------------------------------------------------------------------------------------")
+        println("Release Number check successful! Trying to upload the CSV file")
+        println("----------------------------------------------------------------------------------------------------")
+
+
+        // Upload csv file to the CMS
+        uploadCSVFile(deploymentId, releaseNumber, token, csvFile)
+        println()
+        println()
+        println("----------------------------------------------------------------------------------------------------")
+        println("CSV File uploaded successfully")
+        println("----------------------------------------------------------------------------------------------------")
+    }
+
+    void checkArguments() {
+        if (apkPath == null || apkPath.isEmpty())
+            throw new GradleException("Android APK Path is not set, pass apkPath as an argument")
+
+        def apkFile = new File(apkPath)
+        if (!apkFile.exists())
+            throw new GradleException("APK file does not exist at the specified path, check the file again?")
+
+        if (androidHomePath == null || androidHomePath.isEmpty())
+            throw new GradleException("Android SDK Path is not set, either set ANDROID_HOME or pass androidHomePath as an argument")
+
+        try {
+         Integer.valueOf(releaseNumber)
+        } catch(NumberFormatException ignored) {
+            throw new GradleException("releaseNumber should be an integer, please pass the correct releaseNumber")
+        }
+
+        if (releaseNumber == null || releaseNumber.isEmpty() || Integer.valueOf(releaseNumber) < 0) {
+            throw new GradleException("releaseNumber is not properly defined, please pass the correct releaseNumber as an argument")
+        }
+
+        if (token == null || token.isEmpty()) {
+            throw new GradleException("releaseNumber is not properly defined, please pass the correct releaseNumber as an argument")
+        }
+    }
+
+    File createBindingsFile() {
+        // Create bindings directory
+        def bindingDir = new File(project.buildDir, "navana/bindings")
+        if (!bindingDir.exists()) bindingDir.mkdirs()
+
+        // Create CSV file
+        def csvFile = new File(bindingDir, "navana_bindings.csv")
+        if (csvFile.exists()) csvFile.delete()
+        csvFile.createNewFile()
+
+        return csvFile
+    }
+
+    String getAaptFolderFromSdk(String sdkPath) {
+        if (sdkPath == null)
+            throw new GradleException("Android SDK Path is not set, either set ANDROID_HOME or pass androidHomePath as an argument")
+        def buildToolsFolder = new File(sdkPath, "build-tools")
+        try {
+            def latestBuildTool = buildToolsFolder.listFiles().first()
+            return latestBuildTool.path
+        } catch (NoSuchElementException ignored) {
+            throw new GradleException("No build-tools found in directory ${buildToolsFolder.path}")
+        }
+    }
+
+    String makeText(String line) {
+        if (line.contains("spec") && line.contains(":id")) {
+            def vid = line.substring(line.indexOf("0x7"), line.indexOf("0x7") + 10)
+            def label = line.substring(line.indexOf(':') + 4, line.lastIndexOf(':'))
+
+            return "$vid,$label, FALSE"
+        } else {
+            return ""
+        }
+    }
+
+    ByteArrayOutputStream executeCommand(String aaptFolderPath, DefaultOperatingSystem os) {
+        def output = new ByteArrayOutputStream()
+        project.exec {
+            // Set working directory
+            workingDir(aaptFolderPath)
+
+            // For Linux
+            if (os.isLinux() || os.isMacOsX()) {
+                commandLine("./aapt", "d", "resources", apkPath)
+            }
+
+            // For Windows
+            if (os.isWindows())
+                commandLine("cmd", "/c", "aapt.exe", "d", "resources", apkPath)
+
+            standardOutput = output
+        }
+
+        return output
+    }
+
+    void writeToCSVFile(File csvFile, ByteArrayOutputStream outputStream) {
+        def fileWriter = new FileWriter(csvFile)
+        outputStream.toString().lines().forEach { String line ->
+            String parsedText = makeText(line)
+            if (parsedText.isEmpty()) return
+            fileWriter.write(parsedText + "\n")
+        }
+        fileWriter.close()
+    }
+
+    String checkReleaseNumber(String localReleaseNumber, String token) {
+        def deploymentUrlConnection = new URL("http://staging-navana-zabaan.azurewebsites.net/api/v1/deployment/me").openConnection()
+        deploymentUrlConnection.setRequestProperty("Authorization", "Bearer $token")
+
+        try {
+            def responseCode = deploymentUrlConnection.getResponseCode()
+
+            def jsonResponse = deploymentUrlConnection.getInputStream().getText()
+            def jsonMap = new JsonSlurper().parseText(jsonResponse)
+            String remoteReleaseNumber = jsonMap.get("num")
+
+            if (remoteReleaseNumber.toInteger() != localReleaseNumber.toInteger())
+                throw new GradleException("releaseNumber($localReleaseNumber) does not match the latest remote releaseNumber($remoteReleaseNumber), update your releaseNumber to match the latest release on the CMS")
+
+            return jsonMap.get("id")
+        } catch(UnknownHostException exception) {
+            throw new GradleException("Seems like there's some issue with your internet connection. Please try again later.", exception)
+        } catch(IOException exception) {
+            throw new GradleException("Error uploading bindings file\nServer response: ${deploymentUrlConnection.getErrorStream().getText()}", exception)
+        } catch(Exception exception) {
+            throw new GradleException("Some error occured while uploading the bindings file.", exception)
+        }
+    }
+
+    void uploadCSVFile(String deploymentId, String releaseNumber, String token, File csvFile) {
+        def uploadUrlConnection = new URL("http://staging-navana-zabaan.azurewebsites.net/api/v1/screen_element/auto_upload").openConnection()
+        uploadUrlConnection.setDoInput(true)
+        uploadUrlConnection.setDoOutput(true)
+        uploadUrlConnection.setUseCaches(false)
+        uploadUrlConnection.setRequestMethod("POST")
+        uploadUrlConnection.setRequestProperty('Connection', 'Keep-Alive')
+        uploadUrlConnection.setRequestProperty("Authorization", "Bearer $token")
+        uploadUrlConnection.setRequestProperty('Content-Type', 'multipart/form-data; boundary=' + boundary)
+
+        def outputStream = new DataOutputStream(uploadUrlConnection.getOutputStream())
+
+        writeDataToUploadOutputStream(outputStream, deploymentId, releaseNumber, csvFile)
+
+        try {
+            def responseCode = uploadUrlConnection.getResponseCode()
+            def jsonResponse = uploadUrlConnection.getInputStream().getText()
+        } catch(UnknownHostException exception) {
+            throw new GradleException("Seems like there's some issue with your internet connection. Please try again later.", exception)
+        } catch(IOException exception) {
+            throw new GradleException("Error uploading bindings file\nServer response: ${uploadUrlConnection.getErrorStream().getText()}", exception)
+        } catch(Exception exception) {
+            throw new GradleException("Some error occured while uploading the bindings file.", exception)
+        }
+    }
+
+    void writeDataToUploadOutputStream(DataOutputStream outputStream, String deploymentId, String releaseNumber, File csvFile) {
+
+        try {
+            def fileInputStream = new FileInputStream(csvFile)
+
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd)
+            outputStream.writeBytes('Content-Disposition: form-data; name="version"' + lineEnd)
+            outputStream.writeBytes('Content-Type: text/plain; charset=UTF-8' + lineEnd)
+            outputStream.writeBytes('Content-Transfer-Encoding: 8bit' + lineEnd)
+            outputStream.writeBytes(lineEnd)
+            outputStream.writeBytes(releaseNumber)
+            outputStream.writeBytes(lineEnd)
+
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd)
+            outputStream.writeBytes('Content-Disposition: form-data; name="d"' + lineEnd)
+            outputStream.writeBytes('Content-Type: text/plain; charset=UTF-8' + lineEnd)
+            outputStream.writeBytes('Content-Transfer-Encoding: 8bit' + lineEnd)
+            outputStream.writeBytes(lineEnd)
+            outputStream.writeBytes(deploymentId)
+            outputStream.writeBytes(lineEnd)
+
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd)
+
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=${csvFile.getName()} $lineEnd")
+            outputStream.writeBytes('Content-Type: application/octet-stream' + lineEnd)
+            outputStream.writeBytes('Content-Transfer-Encoding: binary' + lineEnd)
+            outputStream.writeBytes(lineEnd)
+
+            def maxBufferSize = 1 * 1024 * 1024
+            def bytesAvailable = fileInputStream.available()
+            def bufferSize = Math.min(bytesAvailable, maxBufferSize)
+            def buffer = new byte[bufferSize]
+            def bytesRead = fileInputStream.read(buffer, 0, bufferSize)
+            while (bytesRead > 0) {
+                outputStream.write(buffer, 0, bufferSize)
+                bytesAvailable = fileInputStream.available()
+                bufferSize = Math.min(bytesAvailable, maxBufferSize)
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize)
+            }
+
+            outputStream.writeBytes(lineEnd)
+            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd)
+            fileInputStream.close()
+            outputStream.flush()
+            outputStream.close()
+        } catch(Exception exception) {
+            throw new GradleException("Some errors occured while processing the file. Please check that the file is correctly formed and all the arguments are correct", exception)
+        }
+    }
+}
+
+task uploadBindings(type: ZabaanUploadTask)

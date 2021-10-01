@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BharatSdkDemo 1.0.2</string>
+    <string name="app_version">v_1.0.0</string>
+
+    <string name="speak_msg1">You are on the Login Page.</string>
+    <string name="speak_msg2">To use the app, Press here and enter your Customer ID. You will find it in your Passbook</string>
+    <string name="speak_msg3">Press here and enter your secret password.</string>
+    <string name="speak_msg4">After that press here to Login.</string>
+    <string name="speak_msg5">If you forgot your password, press here.</string>
+
+    <string name="str_forgot_password"><u>Forgot Password?</u></string>
+    <string name="str_set_up_quick_access_pin"><u>set up quick access pin</u></string>
+    <string name="str_policy"><u>Secure banking</u> &amp; <u>privacy policy</u></string>
+</resources>

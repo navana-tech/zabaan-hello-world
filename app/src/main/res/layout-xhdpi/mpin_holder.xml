@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <include
+        android:id="@+id/first_number"
+        layout="@layout/textview_full_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_xsmall"
+        android:layout_marginEnd="@dimen/padding_xsmall"
+        app:layout_constraintEnd_toStartOf="@+id/second_number"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <include
+        android:id="@+id/second_number"
+        layout="@layout/textview_full_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_xsmall"
+        android:layout_marginEnd="@dimen/padding_xsmall"
+        app:layout_constraintEnd_toStartOf="@+id/third_number"
+        app:layout_constraintStart_toEndOf="@+id/first_number" />
+
+    <include
+        android:id="@+id/third_number"
+        layout="@layout/textview_full_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_xsmall"
+        android:layout_marginEnd="@dimen/padding_xsmall"
+        app:layout_constraintEnd_toStartOf="@+id/fourth_number"
+        app:layout_constraintStart_toEndOf="@+id/second_number" />
+
+    <include
+        android:id="@+id/fourth_number"
+        layout="@layout/textview_full_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_xsmall"
+        android:layout_marginEnd="@dimen/padding_xsmall"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/third_number" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

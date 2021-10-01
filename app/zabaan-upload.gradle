@@ -1,10 +1,11 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.nativeplatform.platform.internal.DefaultOperatingSystem
 import groovy.json.JsonSlurper
-
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.options.Option
 import javax.net.ssl.*
 import java.io.*
-
 import java.nio.charset.StandardCharsets
 
 /**
@@ -13,6 +14,23 @@ import java.nio.charset.StandardCharsets
  * 2. [Optional] androidHomePath - Path to build-tools/<version> which contains aapt
  */
 class ZabaanUploadTask extends DefaultTask {
+    enum Environment {
+        PROD("https://zabaan-backend.navanatech.in"),
+        STAGING("https://staging-navana-zabaan.azurewebsites.net"),
+        DEV("https://dev-navana-zabaan.azurewebsites.net"),
+        ;
+
+        private String value
+
+        Environment(String value) {
+            this.value = value
+        }
+
+        String getValue() {
+            return value
+        }
+    }
+
     @Internal
     @Option(option = "apkPath", description = "Path of the apk")
     String apkPath
@@ -25,19 +43,22 @@ class ZabaanUploadTask extends DefaultTask {
     @Option(option = "token", description = "Token required to upload release to CMS")
     String token
 
-    @Optional
     @Input
     @Option(option = "androidHomePath", description = "Path of android Build tools")
     String androidHomePath
 
+    @Input
+    @Option(option = "environment", description = "Deployment environment to be used (Defaults to PROD)")
+    Environment environment = Environment.STAGING
+
     private static def boundary = 'abcd' + Long.toString(System.currentTimeMillis()) * 2 + 'dcba'
     private static def twoHyphens = '--'
-    private static def lineEnd = '\r\n'
+    private static def lineEnd = '\r'
 
     @TaskAction
     void execute() {
-        logger.lifecycle("'filePath': ${apkPath}")
-        logger.lifecycle("'buildPathTool': ${androidHomePath}")
+        // logger.lifecycle("'filePath': ${apkPath}")
+        // logger.lifecycle("'buildPathTool': ${androidHomePath}")
 
         // Check if arguments are present
         checkArguments()
@@ -55,26 +76,19 @@ class ZabaanUploadTask extends DefaultTask {
         writeToCSVFile(csvFile, output)
         println()
         println()
-        println("----------------------------------------------------------------------------------------------------")
-        println("CSV File created at $csvFile.absolutePath")
-        println("----------------------------------------------------------------------------------------------------")
+        println("!!! CSV file created at $csvFile.absolutePath !!!")
 
         // Check release number to make sure we are always targeting the latest release and return deployment id
         def deploymentId = checkReleaseNumber(releaseNumber, token)
         println()
         println()
-        println("----------------------------------------------------------------------------------------------------")
-        println("Release Number check successful! Trying to upload the CSV file")
-        println("----------------------------------------------------------------------------------------------------")
-
+        println("!!! Release number check successful! Trying to upload the CSV file !!!")
 
         // Upload csv file to the CMS
         uploadCSVFile(deploymentId, releaseNumber, token, csvFile)
         println()
         println()
-        println("----------------------------------------------------------------------------------------------------")
-        println("CSV File uploaded successfully")
-        println("----------------------------------------------------------------------------------------------------")
+        println("!!! CSV file uploaded successfully !!!")
     }
 
     void checkArguments() {
@@ -85,12 +99,17 @@ class ZabaanUploadTask extends DefaultTask {
         if (!apkFile.exists())
             throw new GradleException("APK file does not exist at the specified path, check the file again?")
 
-        if (androidHomePath == null || androidHomePath.isEmpty())
-            throw new GradleException("Android SDK Path is not set, either set ANDROID_HOME or pass androidHomePath as an argument")
+        if (androidHomePath == null || androidHomePath.isEmpty()) {
+            if (System.getenv("ANDROID_HOME") == null) {
+                throw new GradleException("Android SDK Path is not set, either set ANDROID_HOME or pass androidHomePath as an argument")
+            } else {
+                androidHomePath = System.getenv("ANDROID_HOME")
+            }
+        }
 
         try {
-         Integer.valueOf(releaseNumber)
-        } catch(NumberFormatException ignored) {
+            Integer.valueOf(releaseNumber)
+        } catch (NumberFormatException ignored) {
             throw new GradleException("releaseNumber should be an integer, please pass the correct releaseNumber")
         }
 
@@ -100,6 +119,18 @@ class ZabaanUploadTask extends DefaultTask {
 
         if (token == null || token.isEmpty()) {
             throw new GradleException("releaseNumber is not properly defined, please pass the correct releaseNumber as an argument")
+        }
+
+        environment = Environment.STAGING
+        if (environment == null) {
+            environment = Environment.PROD
+            println()
+            println()
+            println("!!! No environment specified, using $environment Environment for running the script !!!")
+        } else {
+            println()
+            println()
+            println("!!! Using $environment Environment for running the script !!!")
         }
     }
 
@@ -162,7 +193,9 @@ class ZabaanUploadTask extends DefaultTask {
 
     void writeToCSVFile(File csvFile, ByteArrayOutputStream outputStream) {
         def fileWriter = new FileWriter(csvFile)
-        outputStream.toString().lines().forEach { String line ->
+        def outputArray = outputStream.toString().split("\\R")
+
+        outputArray.each { String line ->
             String parsedText = makeText(line)
             if (parsedText.isEmpty()) return
             fileWriter.write(parsedText + "\n")
@@ -171,8 +204,9 @@ class ZabaanUploadTask extends DefaultTask {
     }
 
     String checkReleaseNumber(String localReleaseNumber, String token) {
-        def deploymentUrlConnection = new URL("http://staging-navana-zabaan.azurewebsites.net/api/v1/deployment/me").openConnection()
+        def deploymentUrlConnection = new URL("${environment.getValue()}/api/v1/deployment/me").openConnection()
         deploymentUrlConnection.setRequestProperty("Authorization", "Bearer $token")
+        deploymentUrlConnection.setRequestProperty("User-Agent", "Zabaan/1.0")
 
         try {
             def responseCode = deploymentUrlConnection.getResponseCode()
@@ -182,20 +216,20 @@ class ZabaanUploadTask extends DefaultTask {
             String remoteReleaseNumber = jsonMap.get("num")
 
             if (remoteReleaseNumber.toInteger() != localReleaseNumber.toInteger())
-                throw new GradleException("releaseNumber($localReleaseNumber) does not match the latest remote releaseNumber($remoteReleaseNumber), update your releaseNumber to match the latest release on the CMS")
+                throw new GradleException("releaseNumber($localReleaseNumber) does not match the releaseNumber($remoteReleaseNumber) from the token, update your releaseNumber or token from the CMS")
 
             return jsonMap.get("id")
-        } catch(UnknownHostException exception) {
+        } catch (UnknownHostException exception) {
             throw new GradleException("Seems like there's some issue with your internet connection. Please try again later.", exception)
-        } catch(IOException exception) {
-            throw new GradleException("Error uploading bindings file\nServer response: ${deploymentUrlConnection.getErrorStream().getText()}", exception)
-        } catch(Exception exception) {
+        } catch (IOException exception) {
+            throw new GradleException("Error uploading bindings fileServer response: ${deploymentUrlConnection.getErrorStream().getText()}", exception)
+        } catch (Exception exception) {
             throw new GradleException("Some error occured while uploading the bindings file.", exception)
         }
     }
 
     void uploadCSVFile(String deploymentId, String releaseNumber, String token, File csvFile) {
-        def uploadUrlConnection = new URL("http://staging-navana-zabaan.azurewebsites.net/api/v1/screen_element/auto_upload").openConnection()
+        def uploadUrlConnection = new URL("${environment.getValue()}/api/v1/screen_element/auto_upload").openConnection()
         uploadUrlConnection.setDoInput(true)
         uploadUrlConnection.setDoOutput(true)
         uploadUrlConnection.setUseCaches(false)
@@ -203,6 +237,7 @@ class ZabaanUploadTask extends DefaultTask {
         uploadUrlConnection.setRequestProperty('Connection', 'Keep-Alive')
         uploadUrlConnection.setRequestProperty("Authorization", "Bearer $token")
         uploadUrlConnection.setRequestProperty('Content-Type', 'multipart/form-data; boundary=' + boundary)
+        uploadUrlConnection.setRequestProperty("User-Agent", "Zabaan/1.0")
 
         def outputStream = new DataOutputStream(uploadUrlConnection.getOutputStream())
 
@@ -211,11 +246,11 @@ class ZabaanUploadTask extends DefaultTask {
         try {
             def responseCode = uploadUrlConnection.getResponseCode()
             def jsonResponse = uploadUrlConnection.getInputStream().getText()
-        } catch(UnknownHostException exception) {
+        } catch (UnknownHostException exception) {
             throw new GradleException("Seems like there's some issue with your internet connection. Please try again later.", exception)
-        } catch(IOException exception) {
-            throw new GradleException("Error uploading bindings file\nServer response: ${uploadUrlConnection.getErrorStream().getText()}", exception)
-        } catch(Exception exception) {
+        } catch (IOException exception) {
+            throw new GradleException("Error uploading bindings fileServer response: ${uploadUrlConnection.getErrorStream().getText()}", exception)
+        } catch (Exception exception) {
             throw new GradleException("Some error occured while uploading the bindings file.", exception)
         }
     }
@@ -265,7 +300,7 @@ class ZabaanUploadTask extends DefaultTask {
             fileInputStream.close()
             outputStream.flush()
             outputStream.close()
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             throw new GradleException("Some errors occured while processing the file. Please check that the file is correctly formed and all the arguments are correct", exception)
         }
     }

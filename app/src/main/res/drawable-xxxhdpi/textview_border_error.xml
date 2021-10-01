@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke android:color="@color/errorRed" android:width="@dimen/padding_xsmall"/>
+    <solid android:color="@color/colorWhite"/>
+    <padding android:bottom="@dimen/padding_text" android:left="@dimen/padding_text" android:right="@dimen/padding_text" android:top="@dimen/padding_text"/>
+</shape>

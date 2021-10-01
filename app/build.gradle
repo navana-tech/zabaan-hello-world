@@ -1,41 +1,147 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
+    compileSdkVersion 31
+    buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "com.navana.zabaandemo"
+        applicationId "com.demoapp.hdfcdemo"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def access_token = properties.getProperty('master_token')
+        debug {
+            matchingFallbacks = ['debug']
+            buildConfigField "String", 'ACCESS_TOKEN',access_token
+        }
+        invdemo {
+            matchingFallbacks = ['staging']
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", 'ACCESS_TOKEN',access_token
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.navigation:navigation-fragment:2.2.0-alpha03'
+    implementation 'androidx.navigation:navigation-ui:2.2.0-alpha03'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
+    implementation 'io.github.inflationx:calligraphy3:3.1.1'
+    implementation 'io.github.inflationx:viewpump:2.0.3'
+    implementation 'in.navanatech:zabaan-sdk:1.2.1'
+}
 
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'in.navanatech:zabaan-sdk:1.0.8'
+/*task runExecutableJar(type: JavaExec) {
+    def bundlePath = "D:\\aapt2\\app-debug.aab"
+
+    classpath = files("D:\\aapt2\\bundletool.jar")
+
+    args 'build-apks', '--bundle=', bundlePath,'--output=/MyApp/my_app.apks'
+}*/
+
+afterEvaluate {
+}
+
+/**
+ * Create a custom Task with 2 arguments. Task will throw error if you don't have ANDROID_HOME setup and
+ * buildToolPath has to be passed as second argument.
+ * 1. [Mandatory] apkPath - Path which should lead to the APK
+ * 2. [Optional] buildToolPath - Path to build-tools/<version> which contains aapt
+ */
+class ZabaanTask extends DefaultTask {
+    @Internal
+    @Option(option = "path", description = "Path of the apk")
+    String apkPath = "D:\\git workspace\\cva_sdk_app\\app\\build\\outputs\\apk\\debug\\app-debug.apk"
+    @Optional
+    @Input
+    @Option(option = "buildToolPath", description = "Path of android Build tools")
+    String buildToolPath= "D:\\Android\\SDK\\build-tools\\29.0.3\\aapt.exe"
+    @TaskAction
+    void echoOption() {
+        logger.lifecycle("'filePath': ${apkPath}")
+        logger.lifecycle("'buildPathTool': ${buildToolPath}")
+    }
+}
+
+task getBindings(type: ZabaanTask) {
+    // Get root dir of project and store it in `projectDir` as String
+    System.setProperty("user.dir", project.projectDir.toString())
+    def projectDir = System.getProperty("user.dir")
+    println("project: " + projectDir)
+    // Create binding folder inside build directory
+    File navanaDir = file(projectDir + "/build/binding/")
+    navanaDir.mkdirs()
+    // Path of CSV
+    def csvPath = navanaDir.absolutePath + '/navana_bindings.csv'
+    doLast {
+        if (!file(apkPath).exists()) {
+            throw new GradleException("APK path invalid.")
+        }
+        // Check if ANDROID_HOME is set, get aapt.exe from there else take from optional parameter
+        def fp = file(System.getenv('ANDROID_HOME') + "/build-tools/${android.buildToolsVersion}/aapt.exe")
+        if (!fp.exists()) {
+            if (buildToolPath == null) {
+                throw new GradleException("Consider setting ANDROID_HOME environment variable or else pass build tools version as parameter to this task.\n" +
+                        "Example --buildToolPath=C:\\Android\\build-tools\\30.0.3")
+            } else {
+                fp = file(buildToolPath+"/aapt")
+            }
+        }
+        def toolPath = fp.absolutePath
+        // Create a CSV file
+        def resultFile = new File(csvPath)
+        new FileOutputStream(csvPath, false).close()
+        def ln = System.getProperty('line.separator')
+        def output = new ByteArrayOutputStream()
+        exec {
+            commandLine 'cmd', '/c', toolPath, 'd', 'resources', apkPath, '|', 'findstr', '":id"'
+            standardOutput = output
+        }
+        // Copy the output from command prompt, process it and make a CSV from it.
+        output.toString().readLines().each {
+            resultFile.append(makeText(it) + ln)
+        }
+    }
+}
+
+String makeText(String line) {
+    def vid
+    def label
+    if (line.contains('spec')) {
+        vid = line.substring(line.indexOf('0x7'), line.indexOf('0x7') + 10)
+        label = line.substring(line.indexOf(':') + 4, line.lastIndexOf(':'))
+        def ans
+        ans = vid + ',' + label + ', FALSE'
+        return ans
+    } else
+        return ""
 }
 apply from: 'zabaan-upload.gradle'

@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">Zabaan Demo</string>
+    <string name="app_name">BharatSdkDemo 1.0.2</string>
+    <string name="app_version">v_1.0.0</string>
+
+    <string name="speak_msg1">You are on the Login Page msd.</string>
+    <string name="speak_msg2">msdTo use the app, Press here and enter your Customer ID. You will find it in your Passbook</string>
+    <string name="speak_msg3">msdfPress here and enter your secret password.</string>
+    <string name="speak_msg4">masdfAfter that press here to Login.</string>
+    <string name="speak_msg5">asdflksdIf you forgot your password, press here.</string>
+
+    <string name="str_forgot_password"><u>Forgot Password?</u></string>
+    <string name="str_set_up_quick_access_pin"><u>set up quick access pin</u></string>
+    <string name="str_policy"><u>Secure banking</u> &amp; <u>privacy policy</u></string>
+    <string name="title_activity_dashboard" translatable="false">Dashboard</string>
+    <string name="tab_text_1" translatable="false">Overview</string>
+    <string name="tab_text_2" translatable="false">Favourites</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">No favourites added</string>
+    <string name="txtenglish">English</string>
+    <string name="txthindi">हिंदी</string>
+    <string name="txtkannada">ಕನ್ನಡ</string>
+    <string name="txttelugu">తెలుగు</string>
 </resources>

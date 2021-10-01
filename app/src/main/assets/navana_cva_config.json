@@ -1,0 +1,6 @@
+{
+  "customer_id": "1",
+  "project_id": "2",
+  "deployment_num": "3",
+  "api_key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTAyNzkzOTgsIm5iZiI6MTYxMDI3OTM5OCwianRpIjoiMjhmYmExMzAtY2JiZi00YzFkLTk0OWItNmQxNTVjYWQzMzVkIiwiaWRlbnRpdHkiOnsiY3VzdG9tZXJfaWQiOjUsInByb2plY3RfaWQiOjgsImRlcGxveW1lbnRfbnVtIjoxLCJyb2xlIjoiREVQTE9ZTUVOVF9DUlVEIn0sImZyZXNoIjp0cnVlLCJ0eXBlIjoiYWNjZXNzIn0.x0FUJEXBmBLK6v0k7_48KAQNRkbfUoa-ouMMNNm7nHE"
+}

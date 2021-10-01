@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_bg"
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:background="@drawable/textview_border"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/cursor"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:layout_marginBottom="@dimen/padding_small"
+        android:background="@color/colorBlack"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tv_bg"
+        app:layout_constraintEnd_toEndOf="@id/tv_bg"
+        app:layout_constraintStart_toStartOf="@id/tv_bg"
+        app:layout_constraintTop_toTopOf="@id/tv_bg" />
+
+    <TextView
+        android:id="@+id/number_holder"
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:layout_margin="@dimen/padding_xsmall"
+        android:background="@null"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:text=" "
+        android:textColor="@color/colorBlack"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/tv_bg"
+        app:layout_constraintEnd_toEndOf="@id/tv_bg"
+        app:layout_constraintStart_toStartOf="@id/tv_bg"
+        app:layout_constraintTop_toTopOf="@id/tv_bg" />
+
+    <TextView
+        android:id="@+id/number_mask"
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:layout_margin="@dimen/padding_xsmall"
+        android:background="@null"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:text="*"
+        android:textColor="@color/colorBlack"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tv_bg"
+        app:layout_constraintEnd_toEndOf="@id/tv_bg"
+        app:layout_constraintStart_toStartOf="@id/tv_bg"
+        app:layout_constraintTop_toTopOf="@id/tv_bg" />
+</androidx.constraintlayout.widget.ConstraintLayout>

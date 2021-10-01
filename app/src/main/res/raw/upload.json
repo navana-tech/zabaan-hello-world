@@ -1,0 +1,878 @@
+{
+  "project_config": {
+    "id": 1,
+    "project_config_schema_version": 1.1,
+    "project_config_data": "{\"project_name\": \"hdfc_banking_app\",\"min_sdk_version\": 2.12,\"default_assistant_location\":\"ASSISTANT_TOP | ASSISTANT_CENTER_HORIZONTAL\",\"assistant_speaking_animation\":\"WAVE\",\"assistant_highlight_animation\":\"FINGER\",\"language_screen_gradient\":\"c2e9fb | c2e9fb\",\"assistant_animation\": 1,\"language_item_highlight_color\":\"fe801e\" ,\"language_title_color\":\"000000\" ,\"supported_languages\": \"en, as, bn, gu, hi, km, ml, mr, tl, tm\"}"
+  },
+  "language_meta": [
+    {
+      "code": "en",
+      "native_text": "English",
+      "english_text": "English",
+      "choose_text": "Select you Language",
+      "audio_data_url": null,
+      "audio_type": "TTS"
+    },
+    {
+      "code": "hi",
+      "native_text": "हिंदी",
+      "english_text": "Hindi",
+      "choose_text": "अपनी भाषा का चयन करे",
+      "audio_data_url": "https://www.dropbox.com/s/n1x19wp20c40f73/hi.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "gu",
+      "native_text": "ગુજરાતી",
+      "english_text": "Gujarati",
+      "choose_text": "તમારી ભાષા પસંદ કરો",
+      "audio_data_url": "https://www.dropbox.com/s/ooymczhoaojo8ip/gu.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "mr",
+      "native_text": "मराठी",
+      "english_text": "Marathi",
+      "choose_text": "आपली भाषा निवडा",
+      "audio_data_url": "https://www.dropbox.com/s/y5jjpum4ltg5uly/mr.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "bn",
+      "native_text": "বাংলা",
+      "english_text": "Bengali",
+      "choose_text": "আপনার ভাষা নির্বাচন করুন",
+      "audio_data_url": "https://www.dropbox.com/s/6t133afdq0y55o5/bn.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "as",
+      "native_text": "অসমীয়া",
+      "english_text": "Assamese",
+      "choose_text": "বাছ আপানাৰ ভাষা",
+      "audio_data_url": "https://www.dropbox.com/s/owy3qbluly4tc48/as.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "tm",
+      "native_text": "தமிழ்",
+      "english_text": "Tamil",
+      "choose_text": "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
+      "audio_data_url": "https://www.dropbox.com/s/f1cxfwmxw04lq38/tm.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "tl",
+      "native_text": "తెలుగు",
+      "english_text": "Telugu",
+      "choose_text": "మీ భాషను ఎంచుకోండి",
+      "audio_data_url": "https://www.dropbox.com/s/yfzvu6ea0a3wgle/tl.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "km",
+      "native_text": "كٲشُر",
+      "english_text": "Kashmiri",
+      "choose_text": "اپنی زبان کا انتخاب کریں",
+      "audio_data_url": "https://www.dropbox.com/s/gcmc0thjtxljncz/km.zip?dl=1",
+      "audio_type": "AUDIO"
+    },
+    {
+      "code": "ml",
+      "native_text": "മലയാളം",
+      "english_text": "Malayalam",
+      "choose_text": "നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക",
+      "audio_data_url": "https://www.dropbox.com/s/jky05gy6rfwdgxp/ml.zip?dl=1",
+      "audio_type": "AUDIO"
+    }
+  ],
+  "screen_interactions": [
+    {
+      "id": 1,
+      "activity": "MainActivity",
+      "fragment": null,
+      "view_id": "-1",
+      "index": "1"
+    },
+    {
+      "id": 2,
+      "activity": "MainActivity",
+      "fragment": null,
+      "view_id": "0x7f09006d",
+      "index": "2"
+    },
+    {
+      "id": 3,
+      "activity": "MainActivity",
+      "fragment": null,
+      "view_id": "0x7f09006e",
+      "index": "3"
+    },
+    {
+      "id": 4,
+      "activity": "MainActivity",
+      "fragment": null,
+      "view_id": "0x7f090048",
+      "index": "4"
+    },
+    {
+      "id": 5,
+      "activity": "MainActivity",
+      "fragment": null,
+      "view_id": "0x7f090116",
+      "index": "5"
+    },
+    {
+      "id": 6,
+      "activity": "DashboardActivity",
+      "fragment": "PlaceholderFragment",
+      "view_id": "-1",
+      "index": "1"
+    },
+    {
+      "id": 7,
+      "activity": "DashboardActivity",
+      "fragment": "PlaceholderFragment",
+      "view_id": "0x7f09010e",
+      "index": "2"
+    },
+    {
+      "id": 8,
+      "activity": "DashboardActivity",
+      "fragment": "PlaceholderFragment",
+      "view_id": "0x7f09008d",
+      "index": "3"
+    },
+    {
+      "id": 9,
+      "activity": "DashboardActivity",
+      "fragment": "PlaceholderFragment",
+      "view_id": "0x7f09008c",
+      "index": "4"
+    },
+    {
+      "id": 10,
+      "activity": "DashboardActivity",
+      "fragment": "PlaceholderFragment",
+      "view_id": "0x7f09003c",
+      "index": "5"
+    }
+  ],
+  "audio_data": [
+    {
+      "id": "intro_speech",
+      "type": "TTS",
+      "value": "You are on the Login Page.",
+      "lang": "en",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "TTS",
+      "value": "To use the app, Press here and enter your Customer ID. You will find it in your Passbook.",
+      "lang": "en",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "TTS",
+      "value": "Press here and enter your secret password.",
+      "lang": "en",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "TTS",
+      "value": "After that press here to Login.",
+      "lang": "en",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "TTS",
+      "value": "If you forgot your password, press here",
+      "lang": "en",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "TTS",
+      "value": "You are on the overview page.",
+      "lang": "en",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "TTS",
+      "value": "You can view your account balance here.",
+      "lang": "en",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "TTS",
+      "value": "Click here to view more details about your savings account.",
+      "lang": "en",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "TTS",
+      "value": "Click here to view more details about your demat account.",
+      "lang": "en",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "TTS",
+      "value": "Click here to add a new biller.",
+      "lang": "en",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "am_1.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "am_2.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "am_3.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "am_4.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "am_5.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "hi",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "gu",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "mr",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "mr",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "mr",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "mr",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "mr",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "mr",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "mr",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "mr",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "mr",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "mr",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "bn",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "bn",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "bn",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "bn",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "bn",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "bn",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "bn",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "bn",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "bn",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "bn",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "as",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "as",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "as",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "as",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "as",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "as",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "as",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "as",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "as",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "as",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "tm",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "tm",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "tm",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "tm",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "tm",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "tm",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "tm",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "tm",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "tm",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "tm",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "am_1.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "am_2.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "am_3.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "am_4.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "am_5.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "tl",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "km",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "km",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "km",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "km",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "km",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "km",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "km",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "km",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "km",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "km",
+      "screen_interaction_id": 10
+    },
+    {
+      "id": "intro_speech",
+      "type": "REMOTE",
+      "value": "speak_msg1.ogg",
+      "lang": "ml",
+      "screen_interaction_id": 1
+    },
+    {
+      "id": "enter_customer_id",
+      "type": "REMOTE",
+      "value": "speak_msg2.ogg",
+      "lang": "ml",
+      "screen_interaction_id": 2
+    },
+    {
+      "id": "enter_password",
+      "type": "REMOTE",
+      "value": "speak_msg3.ogg",
+      "lang": "ml",
+      "screen_interaction_id": 3
+    },
+    {
+      "id": "press_to_login",
+      "type": "REMOTE",
+      "value": "speak_msg4.ogg",
+      "lang": "ml",
+      "screen_interaction_id": 4
+    },
+    {
+      "id": "forgot_password_press_here",
+      "type": "REMOTE",
+      "value": "speak_msg5.ogg",
+      "lang": "ml",
+      "screen_interaction_id": 5
+    },
+    {
+      "id": "overview_page",
+      "type": "REMOTE",
+      "value": "ds_1.mp3",
+      "lang": "ml",
+      "screen_interaction_id": 6
+    },
+    {
+      "id": "acc_balance",
+      "type": "REMOTE",
+      "value": "ds_2.mp3",
+      "lang": "ml",
+      "screen_interaction_id": 7
+    },
+    {
+      "id": "saving_acc",
+      "type": "REMOTE",
+      "value": "ds_3.mp3",
+      "lang": "ml",
+      "screen_interaction_id": 8
+    },
+    {
+      "id": "demat_acc",
+      "type": "REMOTE",
+      "value": "ds_4.mp3",
+      "lang": "ml",
+      "screen_interaction_id": 9
+    },
+    {
+      "id": "add_new_biller",
+      "type": "REMOTE",
+      "value": "ds_5.mp3",
+      "lang": "ml",
+      "screen_interaction_id": 10
+    }
+  ],
+  "versions": {
+    "project_config": 1.0,
+    "screen_interaction": 1.0,
+    "language_meta": 1.0,
+    "audio_en": 1.0,
+    "audio_hi": 1.0,
+    "audio_gu": 1.0,
+    "audio_mr": 1.0,
+    "audio_bn": 1.0,
+    "audio_as": 1.0,
+    "audio_tm": 1.0,
+    "audio_tl": 1.0,
+    "audio_km": 1.0,
+    "audio_ml": 1.0
+  }
+}

@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+#noinspection ShrinkerUnresolvedReference
+
+-keep class com.navana.sdk.internal.commons.** {*;}
+-keep class com.navana.sdk.internal.apimodels.** {*;}
+-dontwarn com.airbnb.lottie.**
+-keep class com.airbnb.lottie.** {*;}

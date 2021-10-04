@@ -15,7 +15,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".newDemo.WebDemoActivity"></activity>
         <activity
             android:name=".newDemo.NewDashboardActivity"
             android:screenOrientation="portrait"

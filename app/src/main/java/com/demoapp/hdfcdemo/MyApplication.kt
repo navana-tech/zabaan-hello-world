@@ -1,46 +1,37 @@
-package com.demoapp.hdfcdemo;
+package com.demoapp.hdfcdemo
 
-import android.content.Context;
+import android.content.Context
+import android.util.Log
+import androidx.multidex.MultiDexApplication
+import com.demoapp.hdfcdemo.MyApplication
+import com.zabaan.sdk.InitializeParams
+import com.zabaan.sdk.Zabaan
+import java.lang.Exception
 
-import androidx.multidex.MultiDexApplication;
-
-import com.zabaan.sdk.InitializeParams;
-import com.zabaan.sdk.Zabaan;
-
-public class MyApplication extends MultiDexApplication {
-    private static Context mContext;
-    public static boolean isIntroPlayed = false;
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = getApplicationContext();
+class MyApplication : MultiDexApplication() {
+    override fun onCreate() {
+        super.onCreate()
+        appContext = applicationContext
         try {
-            InitializeParams params = new InitializeParams.Builder()
-                    .context(this)
-                    .accessToken(BuildConfig.ACCESS_TOKEN)
-                    .build();
-            Zabaan.setDebug(true);
-            Zabaan.setSandbox(true);
-            Zabaan zabaan = Zabaan.init(params);
-        } catch (Exception e) {
-//            NavanaUtils.log('e', "Application", ""+e.getMessage());
+            val params: InitializeParams = InitializeParams.Builder()
+                .context(this)
+                .accessToken(BuildConfig.ACCESS_TOKEN)
+                .build()
+            Zabaan.setDebug(true)
+            Zabaan.setSandbox(true)
+            Zabaan.init(params)
+        } catch (e: Exception) {
+            Log.e("Exception", "Navana Assistant Failed to initialize : "+e.message)
         }
-        /*ViewPump.init(ViewPump.builder()
-                .addInterceptor(new CustomTextViewInterceptor())
-                .addInterceptor(new CalligraphyInterceptor(
-                        new CalligraphyConfig.Builder()
-                                .setDefaultFontPath("fonts/mukta.ttf")
-                                .setFontAttrId(R.attr.fontPath)
-                                .build()))
-                .build());*/
     }
 
-    public static Context getAppContext() {
-        return mContext;
+    override fun onTerminate() {
+        super.onTerminate()
     }
 
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
+    companion object {
+        var appContext: Context? = null
+            private set
+        var isIntroPlayed = false
     }
 }

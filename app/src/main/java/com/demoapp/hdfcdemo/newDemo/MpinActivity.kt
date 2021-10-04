@@ -1,386 +1,329 @@
-package com.demoapp.hdfcdemo.newDemo;
+package com.demoapp.hdfcdemo.newDemo
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
+import com.zabaan.sdk.AssistantInteractionListener
+import com.zabaan.sdk.AssistantStateListener
+import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.ImageButton
+import android.widget.TextView
+import android.os.Bundle
+import com.demoapp.hdfcdemo.R
+import com.zabaan.sdk.Zabaan
+import android.content.Intent
+import android.os.Handler
+import com.demoapp.hdfcdemo.newDemo.LoginActivity
+import com.zabaan.sdk.internal.interaction.StateInteractionRequest
+import android.text.TextUtils
+import android.view.animation.Animation
+import android.view.animation.AlphaAnimation
+import com.zabaan.sdk.internal.interaction.ViewInteractionRequest
+import android.view.LayoutInflater
+import androidx.appcompat.widget.AppCompatImageView
+import android.os.Looper
+import android.util.Log
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.zabaan.common.ZabaanSpeakable
+import com.zabaan.common.ZabaanLanguages
+import java.lang.Exception
+import java.lang.StringBuilder
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-
-import com.demoapp.hdfcdemo.R;
-import com.zabaan.sdk.AssistantInteractionListener;
-import com.zabaan.sdk.AssistantStateListener;
-import com.zabaan.sdk.NavanaAssistantException;
-import com.zabaan.sdk.Zabaan;
-import com.zabaan.common.ZabaanLanguages;
-import com.zabaan.common.ZabaanSpeakable;
-import com.zabaan.sdk.internal.interaction.StateInteractionRequest;
-import com.zabaan.sdk.internal.interaction.ViewInteractionRequest;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-public class MpinActivity extends AppCompatActivity implements AssistantInteractionListener, AssistantStateListener {
-    private static final String KEYPAD = "k";
-    private static final String TICK = "t";
-
-    Context mContext;
-    ConstraintLayout dialPad;
-    ConstraintLayout otpInput;
-    ImageButton confirmTick;
-    TextView tvPayNow;
-    int mNumHolders;
-    int mIndex = 0;
-    ImageView imgLogout, imgHome;
-    private boolean isCVAPlaying;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mpin);
-        initVariables();
-        assignViews();
-        attachListeners();
+class MpinActivity : AppCompatActivity(), AssistantInteractionListener, AssistantStateListener {
+    var mContext: Context? = null
+    var dialPad: ConstraintLayout? = null
+    var otpInput: ConstraintLayout? = null
+    var confirmTick: ImageButton? = null
+    var tvPayNow: TextView? = null
+    var mNumHolders = 0
+    var mIndex = 0
+    var imgLogout: ImageView? = null
+    var imgHome: ImageView? = null
+    private var isCVAPlaying = false
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_mpin)
+        initVariables()
+        assignViews()
+        attachListeners()
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Zabaan.getInstance().show(this);
-        Zabaan.getInstance().setScreenName("MPinActivity");
-        Zabaan.getInstance().setAssistantStateListener(this);
-        Zabaan.getInstance().setAssistantInteractionListener(this);
+    public override fun onResume() {
+        super.onResume()
+        Zabaan.getInstance().show(this)
+        Zabaan.getInstance().setScreenName("MPinActivity")
+        Zabaan.getInstance().setAssistantStateListener(this)
+        Zabaan.getInstance().setAssistantInteractionListener(this)
         //requestOTP(phoneNumber);
         while (mIndex > 0) {
-            mIndex--;
-            setCharacter("");
+            mIndex--
+            setCharacter("")
         }
-        checkEnableConfirm();
-        clearAnimation();
+        checkEnableConfirm()
+        clearAnimation()
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
+    public override fun onPause() {
+        super.onPause()
     }
 
-
-    public void clearAnimation() {
-
+    fun clearAnimation() {}
+    private fun initVariables() {
+        mContext = this@MpinActivity
     }
 
-    private void initVariables() {
-        mContext = MpinActivity.this;
+    private fun assignViews() {
+        dialPad = findViewById(R.id.dialpad)
+        otpInput = findViewById(R.id.mpin_input)
+        otpInput?.let {
+            mNumHolders = it.getChildCount()
+        }
+        confirmTick = findViewById(R.id.confirm_tick)
+        imgLogout = findViewById(R.id.img_logout)
+        imgHome = findViewById(R.id.img_home)
+        tvPayNow = findViewById(R.id.tv_pay_now)
     }
 
-    private void assignViews() {
-        dialPad = findViewById(R.id.dialpad);
-        otpInput = findViewById(R.id.mpin_input);
-        mNumHolders = otpInput.getChildCount();
-        confirmTick = findViewById(R.id.confirm_tick);
-        imgLogout = findViewById(R.id.img_logout);
-        imgHome = findViewById(R.id.img_home);
-        tvPayNow = findViewById(R.id.tv_pay_now);
-    }
-
-
-    private void attachListeners() {
-        for (int i = 0; i < dialPad.getChildCount(); i++) {
-            if ("backspace".equals(dialPad.getChildAt(i).getTag())) {
-                dialPad.getChildAt(i).setOnClickListener(deleteCharacterListener);
-            } else if ("confirm".equals(dialPad.getChildAt(i).getTag())) {
-                dialPad.getChildAt(i).setOnClickListener(goToNextFragmentListener);
+    private fun attachListeners() {
+        for (i in 0 until dialPad!!.childCount) {
+            if ("backspace" == dialPad!!.getChildAt(i).tag) {
+                dialPad!!.getChildAt(i).setOnClickListener(deleteCharacterListener)
+            } else if ("confirm" == dialPad!!.getChildAt(i).tag) {
+                dialPad!!.getChildAt(i).setOnClickListener(goToNextFragmentListener)
             } else {
-                dialPad.getChildAt(i).setOnClickListener(addCharacterListener);
+                dialPad!!.getChildAt(i).setOnClickListener(addCharacterListener)
             }
         }
-
-        imgLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MpinActivity.this, LoginActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                finish();
-            }
-        });
-
-        imgHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
-        tvPayNow.setOnClickListener(goToNextFragmentListener);
+        imgLogout!!.setOnClickListener {
+            startActivity(
+                Intent(this@MpinActivity, LoginActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            )
+            finish()
+        }
+        imgHome!!.setOnClickListener { finish() }
+        tvPayNow!!.setOnClickListener(goToNextFragmentListener)
     }
 
-    View.OnClickListener goToNextFragmentListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String mPinInputted = getNumbersFromInputField();
-            String mPinRegistered = "1111";
-            if (mPinInputted.equals(mPinRegistered)) {
-                goToNextFragment();
-            } else {
-                showErrorOtp(true);
-                StateInteractionRequest request = new StateInteractionRequest.Builder()
-                        .setState("IncorrectMpin")
-                        .build();
-                Zabaan.getInstance().playInteraction(request);
-            }
+    var goToNextFragmentListener = View.OnClickListener {
+        val mPinInputted = numbersFromInputField
+        val mPinRegistered = "1111"
+        if (mPinInputted == mPinRegistered) {
+            goToNextFragment()
+        } else {
+            showErrorOtp(true)
+            val request: StateInteractionRequest = StateInteractionRequest.Builder()
+                .setState("IncorrectMpin")
+                .build()
+            Zabaan.getInstance().playInteraction(request)
         }
-    };
-
-
-    View.OnClickListener deleteCharacterListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            showErrorOtp(false);
-            if (mIndex > 0)
-                mIndex--;
-            setCharacter("");
-            checkEnableConfirm();
+    }
+    var deleteCharacterListener = View.OnClickListener {
+        showErrorOtp(false)
+        if (mIndex > 0) mIndex--
+        setCharacter("")
+        checkEnableConfirm()
+    }
+    var addCharacterListener = View.OnClickListener { v ->
+        if (!inputFieldIsFilled()) {
+            val number = (v as TextView).text.toString()
+            setCharacter(number)
+            mIndex++
+            checkEnableConfirm()
         }
-    };
-
-    View.OnClickListener addCharacterListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (!inputFieldIsFilled()) {
-                String number = ((TextView) v).getText().toString();
-                setCharacter(number);
-                mIndex++;
-                checkEnableConfirm();
-            }
-        }
-    };
-
-    private boolean inputFieldIsFilled() {
-        return mIndex > mNumHolders - 1;
     }
 
+    private fun inputFieldIsFilled(): Boolean {
+        return mIndex > mNumHolders - 1
+    }
 
-    private void setCharacter(String toSet) {
+    private fun setCharacter(toSet: String) {
         if (mIndex > mNumHolders - 1 || mIndex < 0) // ensure you cant add more numbers if whole field is filled.
-            return;
-
-        ConstraintLayout layoutHolder = (ConstraintLayout) otpInput.getChildAt(mIndex);
-
-        final TextView numberHolder = layoutHolder.findViewById(R.id.number_holder);
-        final TextView number_mask = layoutHolder.findViewById(R.id.number_mask);
-
+            return
+        val layoutHolder = otpInput!!.getChildAt(mIndex) as ConstraintLayout
+        val numberHolder = layoutHolder.findViewById<TextView>(R.id.number_holder)
+        val number_mask = layoutHolder.findViewById<TextView>(R.id.number_mask)
         if (TextUtils.isEmpty(toSet)) {
-            numberHolder.setVisibility(View.INVISIBLE);
-            number_mask.setVisibility(View.GONE);
+            numberHolder.visibility = View.INVISIBLE
+            number_mask.visibility = View.GONE
         } else {
-            numberHolder.setVisibility(View.VISIBLE);
-            numberHolder.setText(toSet);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    number_mask.setVisibility(View.VISIBLE);
-                    numberHolder.setVisibility(View.GONE);
-                }
-            }, 150);
-
+            numberHolder.visibility = View.VISIBLE
+            numberHolder.text = toSet
+            val handler = Handler()
+            handler.postDelayed({
+                number_mask.visibility = View.VISIBLE
+                numberHolder.visibility = View.GONE
+            }, 150)
         }
-
         if (TextUtils.isEmpty(toSet)) {
-            View cursorCurrent = layoutHolder.findViewById(R.id.cursor);
-            startCursorBlink(cursorCurrent);
+            val cursorCurrent = layoutHolder.findViewById<View>(R.id.cursor)
+            startCursorBlink(cursorCurrent)
             if (mIndex + 1 != mNumHolders) {
-                ConstraintLayout nextlayout = (ConstraintLayout) otpInput.getChildAt(mIndex + 1);
-                View cursorNext = nextlayout.findViewById(R.id.cursor);
-                stopCursorBlink(cursorNext);
+                val nextlayout = otpInput!!.getChildAt(mIndex + 1) as ConstraintLayout
+                val cursorNext = nextlayout.findViewById<View>(R.id.cursor)
+                stopCursorBlink(cursorNext)
             }
         } else {
-            View cursorCurrent = layoutHolder.findViewById(R.id.cursor);
-            stopCursorBlink(cursorCurrent);
+            val cursorCurrent = layoutHolder.findViewById<View>(R.id.cursor)
+            stopCursorBlink(cursorCurrent)
             if (mIndex + 1 != mNumHolders) {
-                ConstraintLayout nextlayout = (ConstraintLayout) otpInput.getChildAt(mIndex + 1);
-                View cursorNext = nextlayout.findViewById(R.id.cursor);
-                startCursorBlink(cursorNext);
+                val nextlayout = otpInput!!.getChildAt(mIndex + 1) as ConstraintLayout
+                val cursorNext = nextlayout.findViewById<View>(R.id.cursor)
+                startCursorBlink(cursorNext)
             }
         }
     }
 
-    void startCursorBlink(View view) {
-        view.setVisibility(View.VISIBLE);
-        Animation blinkAnim = new AlphaAnimation(0.0f, 1.0f);
-        blinkAnim.setDuration(530);
-        blinkAnim.setRepeatCount(Animation.INFINITE);
-        blinkAnim.setRepeatMode(Animation.RESTART);
-        view.startAnimation(blinkAnim);
+    fun startCursorBlink(view: View) {
+        view.visibility = View.VISIBLE
+        val blinkAnim: Animation = AlphaAnimation(0.0f, 1.0f)
+        blinkAnim.duration = 530
+        blinkAnim.repeatCount = Animation.INFINITE
+        blinkAnim.repeatMode = Animation.RESTART
+        view.startAnimation(blinkAnim)
     }
 
-    void stopCursorBlink(View view) {
-        view.clearAnimation();
-        view.setVisibility(View.GONE);
+    fun stopCursorBlink(view: View) {
+        view.clearAnimation()
+        view.visibility = View.GONE
     }
 
-    private String getNumbersFromInputField() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < mNumHolders; i++) {
-            ConstraintLayout layoutHolder = (ConstraintLayout) otpInput.getChildAt(i);
-            TextView numberHolder = layoutHolder.findViewById(R.id.number_holder);
-            builder.append(numberHolder.getText());
+    private val numbersFromInputField: String
+        private get() {
+            val builder = StringBuilder()
+            for (i in 0 until mNumHolders) {
+                val layoutHolder = otpInput!!.getChildAt(i) as ConstraintLayout
+                val numberHolder = layoutHolder.findViewById<TextView>(R.id.number_holder)
+                builder.append(numberHolder.text)
+            }
+            return builder.toString()
         }
-        return builder.toString();
 
-    }
-
-    private void checkEnableConfirm() {
+    private fun checkEnableConfirm() {
         if (mIndex < mNumHolders) {
-            confirmTick.setBackgroundResource(R.drawable.grey_background_black_border);
-            confirmTick.setEnabled(false);
-            tvPayNow.setBackgroundResource(R.drawable.grey_button);
+            confirmTick!!.setBackgroundResource(R.drawable.grey_background_black_border)
+            confirmTick!!.isEnabled = false
+            tvPayNow!!.setBackgroundResource(R.drawable.grey_button)
         } else {
-            confirmTick.setBackgroundResource(R.drawable.green_background_black_border);
-            confirmTick.setEnabled(true);
-            tvPayNow.setEnabled(true);
-            tvPayNow.setBackgroundResource(R.drawable.yellow_button);
-            ViewInteractionRequest request = new ViewInteractionRequest.Builder()
-                    .setViewId(R.id.tv_pay_now)
-                    .setState("PayNow")
-                    .build();
-            Zabaan.getInstance().playInteraction(request);
+            confirmTick!!.setBackgroundResource(R.drawable.green_background_black_border)
+            confirmTick!!.isEnabled = true
+            tvPayNow!!.isEnabled = true
+            tvPayNow!!.setBackgroundResource(R.drawable.yellow_button)
+            val request: ViewInteractionRequest = ViewInteractionRequest.Builder()
+                .setViewId(R.id.tv_pay_now)
+                .setState("PayNow")
+                .build()
+            Zabaan.getInstance().playInteraction(request)
         }
     }
 
-
-    private void goToNextFragment() {
-        showSuccessDialog();
+    private fun goToNextFragment() {
+        showSuccessDialog()
     }
 
-    public void showErrorOtp(boolean hasError) {
-
-        for (int i = 0; i < mNumHolders; i++) {
-            ConstraintLayout layoutHolder = (ConstraintLayout) otpInput.getChildAt(i);
-            TextView numberHolder = (layoutHolder.findViewById(R.id.number_holder));
-            TextView tv_bg = (layoutHolder.findViewById(R.id.tv_bg));
-
+    fun showErrorOtp(hasError: Boolean) {
+        for (i in 0 until mNumHolders) {
+            val layoutHolder = otpInput!!.getChildAt(i) as ConstraintLayout
+            val numberHolder = layoutHolder.findViewById<TextView>(R.id.number_holder)
+            val tv_bg = layoutHolder.findViewById<TextView>(R.id.tv_bg)
             if (hasError) {
-                numberHolder.setTextColor(ContextCompat.getColor(MpinActivity.this, R.color.errorRed));
-                tv_bg.setBackgroundResource(R.drawable.textview_border_error);
+                numberHolder.setTextColor(
+                    ContextCompat.getColor(
+                        this@MpinActivity,
+                        R.color.errorRed
+                    )
+                )
+                tv_bg.setBackgroundResource(R.drawable.textview_border_error)
             } else {
-                numberHolder.setTextColor(ContextCompat.getColor(MpinActivity.this, R.color.colorBlack));
-                tv_bg.setBackgroundResource(R.drawable.textview_border);
+                numberHolder.setTextColor(
+                    ContextCompat.getColor(
+                        this@MpinActivity,
+                        R.color.colorBlack
+                    )
+                )
+                tv_bg.setBackgroundResource(R.drawable.textview_border)
             }
         }
         if (hasError) {
-            Animation shake = AnimationUtils.loadAnimation(MpinActivity.this, R.anim.anim_shake);
-            otpInput.startAnimation(shake);
+            val shake = AnimationUtils.loadAnimation(this@MpinActivity, R.anim.anim_shake)
+            otpInput!!.startAnimation(shake)
         }
     }
 
-    void showSuccessDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MpinActivity.this);
-        LayoutInflater inflater = LayoutInflater.from(MpinActivity.this);
-        View dialogView = inflater.inflate(R.layout.dialog_success, null);
+    fun showSuccessDialog() {
+        val dialogBuilder = AlertDialog.Builder(this@MpinActivity)
+        val inflater = LayoutInflater.from(this@MpinActivity)
+        val dialogView = inflater.inflate(R.layout.dialog_success, null)
+        dialogBuilder.setView(dialogView)
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+        val tvMsg = dialogView.findViewById<TextView>(R.id.txt_msg)
+        tvMsg.text = "Thank You! \nYour EMI is successfully paid."
+        val imgClose: AppCompatImageView = dialogView.findViewById(R.id.img_close)
+        imgClose.setOnClickListener { alertDialog.cancel() }
+        val request: StateInteractionRequest = StateInteractionRequest.Builder()
+            .setState("MpinSuccess")
+            .build()
+        Zabaan.getInstance().playInteraction(request)
+    }
 
-        dialogBuilder.setView(dialogView);
+    override fun assistantSpeechDataDownloadError() {}
+    override fun assistantAvailable() {
+        val request: ViewInteractionRequest = ViewInteractionRequest.Builder()
+            .setViewId(R.id.first_number)
+            .setState("MPININTRO")
+            .build()
+        Zabaan.getInstance().playInteraction(request)
+    }
 
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
-
-        TextView tvMsg = dialogView.findViewById(R.id.txt_msg);
-        tvMsg.setText("Thank You! \nYour EMI is successfully paid.");
-
-        AppCompatImageView imgClose = dialogView.findViewById(R.id.img_close);
-        imgClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.cancel();
+    override fun assistantClicked() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (isCVAPlaying) {
+                isCVAPlaying = false
+                Zabaan.getInstance().stopZabaanInteraction()
+            } else {
+                Zabaan.getInstance().stopZabaanInteraction()
+                val request: ViewInteractionRequest = ViewInteractionRequest.Builder()
+                    .setViewId(R.id.first_number)
+                    .setState("MPININTRO")
+                    .build()
+                Zabaan.getInstance().playInteraction(request)
             }
-        });
-
-        StateInteractionRequest request = new StateInteractionRequest.Builder()
-                .setState("MpinSuccess")
-                .build();
-        Zabaan.getInstance().playInteraction(request);
+        }, 200)
     }
 
-
-
-    @Override
-    public void assistantSpeechDataDownloadError() {
-
-    }
-
-    @Override
-    public void assistantAvailable() {
-        ViewInteractionRequest request = new ViewInteractionRequest.Builder()
-                .setViewId(R.id.first_number)
-                .setState("MPININTRO")
-                .build();
-        Zabaan.getInstance().playInteraction(request);
-    }
-
-    @Override
-    public void assistantClicked() {
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isCVAPlaying) {
-                    isCVAPlaying = false;
-                    Zabaan.getInstance().stopZabaanInteraction();
-                } else {
-                    Zabaan.getInstance().stopZabaanInteraction();
-                    ViewInteractionRequest request = new ViewInteractionRequest.Builder()
-                            .setViewId(R.id.first_number)
-                            .setState("MPININTRO")
-                            .build();
-                    Zabaan.getInstance().playInteraction(request);
-                }
-            }
-        }, 200);
-    }
-
-    @Override
-    public void assistantSpeechEnd(@NotNull ZabaanSpeakable zabaanSpeakable, boolean isInterrupted) {
-        isCVAPlaying = false;
-        if (!(TextUtils.isEmpty(zabaanSpeakable.getState())) && zabaanSpeakable.getState().equalsIgnoreCase("IncorrectMpin")) {
-            ViewInteractionRequest request = new ViewInteractionRequest.Builder()
-                    .setViewId(R.id.forget_mpin)
-                    .setState("ResetMpin")
-                    .build();
-            Zabaan.getInstance().playInteraction(request);
+    override fun assistantSpeechEnd(zabaanSpeakable: ZabaanSpeakable, isInterrupted: Boolean) {
+        isCVAPlaying = false
+        if (!TextUtils.isEmpty(zabaanSpeakable.state) && zabaanSpeakable.state.equals(
+                "IncorrectMpin",
+                ignoreCase = true
+            )
+        ) {
+            val request: ViewInteractionRequest = ViewInteractionRequest.Builder()
+                .setViewId(R.id.forget_mpin)
+                .setState("ResetMpin")
+                .build()
+            Zabaan.getInstance().playInteraction(request)
         }
     }
 
-    @Override
-    public void assistantSpeechError(@NotNull ZabaanSpeakable zabaanSpeakable, @Nullable Exception e) {
-        isCVAPlaying = false;
-        Log.e("Assistant Speech Error:", "" + e.getMessage());
+    override fun assistantSpeechError(zabaanSpeakable: ZabaanSpeakable, e: Exception?) {
+        isCVAPlaying = false
+        Log.e("Assistant Speech Error:", "" + e!!.message)
     }
 
-    @Override
-    public void assistantSpeechStart(@NotNull ZabaanSpeakable zabaanSpeakable) {
-        isCVAPlaying = true;
+    override fun assistantSpeechStart(zabaanSpeakable: ZabaanSpeakable) {
+        isCVAPlaying = true
     }
 
-    @Override
-    public void assistantLanguageNotSupported() {
+    override fun assistantLanguageNotSupported() {}
+    override fun assistantSpeechDataDownloaded(zabaanLanguages: ZabaanLanguages) {}
 
-    }
-
-    @Override
-    public void assistantSpeechDataDownloaded(@NotNull ZabaanLanguages zabaanLanguages) {
-
+    companion object {
+        private const val KEYPAD = "k"
+        private const val TICK = "t"
     }
 }
